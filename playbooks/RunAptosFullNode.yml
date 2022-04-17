@@ -1,0 +1,82 @@
+---
+- name: Install and run a Aptos FullNode
+  hosts: stage
+  become: yes
+
+  vars:
+    destin_folder: /root/aptos
+
+  tasks:
+    - name: Create Aptos directory
+      file:
+        path: '{{ destin_folder }}'
+        state: directory
+
+    - name: Create Aptos identity directory
+      file:
+        path: '{{ destin_folder }}/identity'
+        state: directory
+
+    - name: Download Docker compose file
+      get_url:
+        url: https://raw.githubusercontent.com/aptos-labs/aptos-core/main/docker/compose/public_full_node/docker-compose.yaml
+        dest: '{{ destin_folder }}/docker-compose.yaml'
+        mode: 0777
+
+    - name: Download aptos-core configuration file
+      get_url:
+        url: https://raw.githubusercontent.com/aptos-labs/aptos-core/main/docker/compose/public_full_node/public_full_node.yaml
+        dest: '{{ destin_folder }}/public_full_node.yaml'
+        mode: 0777
+
+    - name: Download devenet genesis file
+      get_url:
+        url: https://devnet.aptoslabs.com/genesis.blob
+        dest: '{{ destin_folder }}/genesis.blob'
+        mode: 0777
+
+    - name: Download devenet waypoint file
+      get_url:
+        url: https://devnet.aptoslabs.com/waypoint.txt
+        dest: '{{ destin_folder }}/waypoint.txt'
+        mode: 0777
+
+    - name: Run a command in a new container
+      shell: docker run --rm --name aptos_tools -d -i aptoslab/tools:devnet
+      args:
+        chdir: '{{ destin_folder }}'
+
+    - name: Run docker command
+      shell: docker exec -it aptos_tools aptos-operational-tool generate-key --encoding hex --key-type x25519 --key-file $HOME/private-key.txt
+      args:
+        chdir: '{{ destin_folder }}'
+
+    - name: Run docker command
+      shell: docker exec -it aptos_tools cat $HOME/private-key.txt > $HOME/aptos/identity/private-key.txt
+      args:
+        chdir: '{{ destin_folder }}'
+
+    - name: Run docker command
+      shell: docker exec -it aptos_tools aptos-operational-tool extract-peer-from-file --encoding hex --key-file $HOME/private-key.txt --output-file $HOME/peer-info.yaml &> /dev/null
+      args:
+        chdir: '{{ destin_folder }}'
+
+    - name: Run docker command
+      shell: docker exec -it aptos_tools cat $HOME/peer-info.yaml > $HOME/aptos/identity/peer-info.yaml
+      args:
+        chdir: '{{ destin_folder }}'
+
+    - name: Run docker command
+      shell: PEER_ID=$(sed -n 5p $HOME/aptos/identity/peer-info.yaml | sed 's/    - \(.*\)/\1/')
+      args:
+        chdir: '{{ destin_folder }}'
+
+    - name: Run docker command
+      shell: PRIVATE_KEY=$(cat $HOME/aptos/identity/private-key.txt)
+      args:
+        chdir: '{{ destin_folder }}'
+
+    - name: Docker stop aptos_tools
+      shell: docker stop aptos_tools
+      args:
+        chdir: '{{ destin_folder }}'
