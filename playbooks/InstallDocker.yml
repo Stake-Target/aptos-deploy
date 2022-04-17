@@ -1,15 +1,9 @@
 ---
 - name: Install Docker and Docker Compose
   hosts: stage
-  become: yes
+  become: true
 
   tasks:
-    - name: Install aptitude
-      apt:
-        name: aptitude
-        state: latest
-        update_cache: true
-
     - name: Install required system packages
       apt:
         pkg:

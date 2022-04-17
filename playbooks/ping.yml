@@ -1,7 +1,6 @@
 ---
 - name: Test connection to my servers
   hosts: stage
-  become: yes
 
   tasks:
     - name: Ping my servers
