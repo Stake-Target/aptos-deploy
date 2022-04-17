@@ -87,6 +87,6 @@
         chdir: '{{ destin_folder }}'
 
     - name: Run node
-      shell: docker compose up -d
+      shell: docker-compose up -d
       args:
         chdir: '{{ destin_folder }}'
