@@ -29,13 +29,13 @@
         dest: '{{ destin_folder }}/public_full_node.yaml'
         mode: 0777
 
-    - name: Download devenet genesis file
+    - name: Download devnet genesis file
       get_url:
         url: https://devnet.aptoslabs.com/genesis.blob
         dest: '{{ destin_folder }}/genesis.blob'
         mode: 0777
 
-    - name: Download devenet waypoint file
+    - name: Download devnet waypoint file
       get_url:
         url: https://devnet.aptoslabs.com/waypoint.txt
         dest: '{{ destin_folder }}/waypoint.txt'
