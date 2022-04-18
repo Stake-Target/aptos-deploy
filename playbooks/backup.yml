@@ -1,0 +1,17 @@
+---
+- name: Backup private key and peer info
+  hosts: stage
+  become: true
+
+  tasks:
+    - name: Backup private key
+      fetch:
+        src: /root/aptos/identity/private-key.txt
+        dest: ../identitys/key-{{ inventory_hostname }}.txt
+        flat: yes
+
+    - name: Backup peer info
+      fetch:
+        src: /root/aptos/identity/peer-info.yaml
+        dest: ../identitys/peer-{{ inventory_hostname }}.yaml
+        flat: yes
