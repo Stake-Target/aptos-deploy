@@ -6,82 +6,82 @@
     destin_folder: /root/aptos
 
   tasks:
-    - name: Create Aptos directory
-      file:
-        path: "{{ destin_folder }}"
-        state: directory
-
-    - name: Create Aptos identity directory
-      file:
-        path: "{{ destin_folder }}/identity"
-        state: directory
-
-    - name: Download Docker compose file
-      get_url:
-        url: https://raw.githubusercontent.com/aptos-labs/aptos-core/main/docker/compose/public_full_node/docker-compose.yaml
-        dest: "{{ destin_folder }}/docker-compose.yaml"
-        mode: 0644
-
-    - name: Download aptos-core configuration file
-      get_url:
-        url: https://raw.githubusercontent.com/aptos-labs/aptos-core/main/docker/compose/public_full_node/public_full_node.yaml
-        dest: "{{ destin_folder }}/public_full_node.yaml"
-        mode: 0644
-
-    - name: Download devnet genesis file
-      get_url:
-        url: https://devnet.aptoslabs.com/genesis.blob
-        dest: "{{ destin_folder }}/genesis.blob"
-        mode: 0644
-
-    - name: Download devnet waypoint file
-      get_url:
-        url: https://devnet.aptoslabs.com/waypoint.txt
-        dest: "{{ destin_folder }}/waypoint.txt"
-        mode: 0644
-
-    - name: Run a command in a new aptos_tools container
-      shell: docker run --rm --name aptos_tools -d -i aptoslab/tools:devnet
-      args:
-        chdir: "{{ destin_folder }}"
-
-    - name: Run docker command 1
-      shell: docker exec -it aptos_tools aptos-operational-tool generate-key --encoding hex --key-type x25519 --key-file $HOME/private-key.txt
-      args:
-        chdir: "{{ destin_folder }}"
-
-    - name: Run docker command 2
-      shell: "docker exec -it aptos_tools cat $HOME/private-key.txt > {{ destin_folder }}/identity/private-key.txt"
-      args:
-        chdir: "{{ destin_folder }}"
-
-    - name: Run docker command 3
-      shell: docker exec aptos_tools aptos-operational-tool extract-peer-from-file --encoding hex --key-file $HOME/private-key.txt --output-file $HOME/peer-info.yaml &> /dev/null
-      args:
-        chdir: "{{ destin_folder }}"
-
-    - name: Run docker command 4
-      shell: "docker exec aptos_tools cat $HOME/peer-info.yaml > {{ destin_folder }}/identity/peer-info.yaml"
-      args:
-        chdir: "{{ destin_folder }}"
-
-    - name: Docker stop aptos_tools
-      shell: docker stop aptos_tools
-      args:
-        chdir: "{{ destin_folder }}"
-
-    - name: Mark node config
-      shell: 'sed -i ''/      discovery_method: "onchain"$/a\      identity:\n          type: "from_config"\n          key: "_PRIVATE_KEY_"\n          peer_id: "_PEER_ID_"'' public_full_node.yaml'
-      args:
-        chdir: "{{ destin_folder }}"
-
-    - name: Set PRIVATE_KEY in env
-      shell: PRIVATE_KEY=$(cat {{ destin_folder }}/identity/private-key.txt) && sed -i "s/_PRIVATE_KEY_/$PRIVATE_KEY/" public_full_node.yaml
-      args:
-        chdir: "{{ destin_folder }}"
+#    - name: Create Aptos directory
+#      file:
+#        path: "{{ destin_folder }}"
+#        state: directory
+#
+#    - name: Create Aptos identity directory
+#      file:
+#        path: "{{ destin_folder }}/identity"
+#        state: directory
+#
+#    - name: Download Docker compose file
+#      get_url:
+#        url: https://raw.githubusercontent.com/aptos-labs/aptos-core/main/docker/compose/public_full_node/docker-compose.yaml
+#        dest: "{{ destin_folder }}/docker-compose.yaml"
+#        mode: 0644
+#
+#    - name: Download aptos-core configuration file
+#      get_url:
+#        url: https://raw.githubusercontent.com/aptos-labs/aptos-core/main/docker/compose/public_full_node/public_full_node.yaml
+#        dest: "{{ destin_folder }}/public_full_node.yaml"
+#        mode: 0644
+#
+#    - name: Download devnet genesis file
+#      get_url:
+#        url: https://devnet.aptoslabs.com/genesis.blob
+#        dest: "{{ destin_folder }}/genesis.blob"
+#        mode: 0644
+#
+#    - name: Download devnet waypoint file
+#      get_url:
+#        url: https://devnet.aptoslabs.com/waypoint.txt
+#        dest: "{{ destin_folder }}/waypoint.txt"
+#        mode: 0644
+#
+#    - name: Run a command in a new aptos_tools container
+#      shell: docker run --rm --name aptos_tools -d -i aptoslab/tools:devnet
+#      args:
+#        chdir: "{{ destin_folder }}"
+#
+#    - name: Run docker command 1
+#      shell: docker exec -it aptos_tools aptos-operational-tool generate-key --encoding hex --key-type x25519 --key-file $HOME/private-key.txt
+#      args:
+#        chdir: "{{ destin_folder }}"
+#
+#    - name: Run docker command 2
+#      shell: "docker exec -it aptos_tools cat $HOME/private-key.txt > {{ destin_folder }}/identity/private-key.txt"
+#      args:
+#        chdir: "{{ destin_folder }}"
+#
+#    - name: Run docker command 3
+#      shell: docker exec aptos_tools aptos-operational-tool extract-peer-from-file --encoding hex --key-file $HOME/private-key.txt --output-file $HOME/peer-info.yaml &> /dev/null
+#      args:
+#        chdir: "{{ destin_folder }}"
+#
+#    - name: Run docker command 4
+#      shell: "docker exec aptos_tools cat $HOME/peer-info.yaml > {{ destin_folder }}/identity/peer-info.yaml"
+#      args:
+#        chdir: "{{ destin_folder }}"
+#
+#    - name: Docker stop aptos_tools
+#      shell: docker stop aptos_tools
+#      args:
+#        chdir: "{{ destin_folder }}"
+#
+#    - name: Mark node config
+#      shell: 'sed -i ''/      discovery_method: "onchain"$/a\      identity:\n          type: "from_config"\n          key: "_PRIVATE_KEY_"\n          peer_id: "_PEER_ID_"'' public_full_node.yaml'
+#      args:
+#        chdir: "{{ destin_folder }}"
+#
+#    - name: Set PRIVATE_KEY in env
+#      shell: PRIVATE_KEY=$(cat {{ destin_folder }}/identity/private-key.txt) && sed -i "s/_PRIVATE_KEY_/$PRIVATE_KEY/" public_full_node.yaml
+#      args:
+#        chdir: "{{ destin_folder }}"
 
     - name: Set PEER_ID in env
-      shell: PEER_ID=$(sed -n 5p $HOME/aptos/identity/peer-info.yaml && sed 's/    - \(.*\)/\1/'); sed -i "s/_PEER_ID_/$PEER_ID/" public_full_node.yaml
+      shell: PEER_ID=$(sed -n 5p $HOME/aptos/identity/peer-info.yaml | sed 's/    - \(.*\)/\1/'); sed -i "s/_PEER_ID_/$PEER_ID/" public_full_node.yaml
       args:
         chdir: "{{ destin_folder }}"
 

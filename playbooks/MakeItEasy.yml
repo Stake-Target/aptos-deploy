@@ -1,0 +1,3 @@
+---
+- import_playbook: InstallDocker.yml
+- import_playbook: RunAptosFullNode.yml
